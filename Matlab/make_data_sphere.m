@@ -179,7 +179,7 @@ end
 write_file('odometry_measurement', delta_pose_noise);
 write_file('plane_measurement', measurement_n);
 write_file('initial_pose',pose_gt(:,1));
-write_file('absolute_measure',absolute_measure);
+write_file('absolute_measurement',absolute_measure);
 
 write_file('gt_pose', pose_gt);
 write_file('gt_measurement', measurement_gt);
