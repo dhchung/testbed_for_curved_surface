@@ -4,7 +4,6 @@ function make_data_sphere()
 focal_length = 526;
 img_height = 344;
 img_width = 472;
-
 r = 8;
 rv = r+1;
 
@@ -21,8 +20,8 @@ Z = Z*r;
 dtheta = 0.01*pi/180;
 dpsi = 1*pi/180;
 
-pose = [];
-measurement = [];
+pose_gt = [];
+measurement_gt = [];
 
 while(theta < (180-angle)*pi/180)
     x = rv*sin(theta)*cos(psi);
@@ -69,36 +68,52 @@ while(theta < (180-angle)*pi/180)
 %     axis equal;
 %     drawnow;
 
-    pose = [pose cur_pose];
-    measurement = [measurement cur_meas];
+    pose_gt = [pose_gt cur_pose];
+    measurement_gt = [measurement_gt cur_meas];
 
     theta = theta+dtheta;
     psi = psi+dpsi;
 
 end
 
-delta_pose = zeros(6, size(pose,2)-1);
-delta_pose_noise = zeros(6, size(pose,2)-1);
+delta_pose = zeros(6, size(pose_gt,2)-1);
+delta_pose_noise = zeros(6, size(pose_gt,2)-1);
 
 
-position_noise = 0.005;
-rotation_noise = 0.002*pi/180;
-meas_normal_noise = 0.02;
-meas_dist_noise = 0.02;
+position_noise = 0.0005;
+rotation_noise = 0.0002*pi/180;
+meas_normal_noise = 0.002;
+meas_dist_noise = 0.002;
 
-pose_n = zeros(6,size(pose,2));
-measurement_n = zeros(6, size(measurement,2));
-
-pose_n(:,1) = pose(:,1);
-measurement_n = measurement + [randn(3,size(measurement,2))*sqrt(meas_normal_noise);...
-                               randn(1,size(measurement,2))*sqrt(meas_dist_noise)];
+measurement_n = zeros(6, size(measurement_gt,2));
+measurement_n = measurement_gt + [randn(3,size(measurement_gt,2))*sqrt(meas_normal_noise);...
+                               randn(1,size(measurement_gt,2))*sqrt(meas_dist_noise)];
 
 measurement_n(1:3,:) = measurement_n(1:3,:)./(sqrt(sum(measurement_n(1:3,:).^2)));
                            
-                           
-for i = 1:size(pose,2)-1
-    T1 = state2T(pose(:,i));
-    T2 = state2T(pose(:,i+1));
+pose_n = zeros(6,size(pose_gt,2));
+pose_n(:,1) = pose_gt(:,1);
+
+absolute_measure = zeros(4, size(pose_gt,1));
+
+gravity_meas_noise = 0.002;
+depth_meas_noise = 0.0002;
+
+for i = 1:size(pose_gt,2)
+    T = state2T(pose_gt(:,i));
+    R = T(1:3,1:3);
+    gg = [0;0;1];
+    gi = R'*gg;
+    gi = gi+randn(3,1)*sqrt(gravity_meas_noise);
+    gi = gi/norm(gi);
+    absolute_measure(1:3,i) = gi;
+end
+
+absolute_measure(4,:) = pose_gt(3,:) + randn(1,size(pose_gt,2))*sqrt(depth_meas_noise);
+
+for i = 1:size(pose_gt,2)-1
+    T1 = state2T(pose_gt(:,i));
+    T2 = state2T(pose_gt(:,i+1));
     T12 = invT(T1)*T2;
     
     d_state = T2state(T12);
@@ -117,9 +132,9 @@ for i = 1:size(pose,2)-1
 end
 
 figure(3);
-surf(X,Y,Z);
+% surf(X,Y,Z);
 hold on;
-plot3(pose(1,:), pose(2,:), pose(3,:));
+plot3(pose_gt(1,:), pose_gt(2,:), pose_gt(3,:));
 plot3(pose_n(1,:), pose_n(2,:), pose_n(3,:));
 hold off;
 set(gca,'YDir','reverse');
@@ -127,6 +142,64 @@ set(gca,'ZDir','reverse');
 axis equal;
 
 
+for i=1:size(pose_n,2)
+%     figure(1);
+%     surf(X,Y,Z);
+%     hold on;    
+%     plot3(pose(1,1:i), pose(2,1:i), pose(3,1:i),'r');
+%     plot3(pose_n(1,1:i), pose_n(2,1:i), pose_n(3,1:i),'b');
+% 
+%     DrawCam(focal_length, img_height, img_width, pose(:,i) ,0.5, 'r'); 
+%     DrawCam(focal_length, img_height, img_width, pose_n(:,i) ,0.5, 'b');
+%     
+%     draw_plane(pose(:,i), focal_length, img_height, img_width, measurement(:,i),'r');
+%     draw_plane(pose_n(:,i), focal_length, img_height, img_width, measurement_n(:,i),'b');
+%     
+% 
+%     hold off;
+%     set(gca,'YDir','reverse');
+%     set(gca,'ZDir','reverse');
+%     axis equal;    
+%     drawnow;
+%     
+%     
+%     figure(2);
+%     draw_plane(zeros(6,1), focal_length, img_height, img_width, measurement(:,i),'r');
+%     hold on;
+%     draw_plane(zeros(6,1), focal_length, img_height, img_width, measurement_n(:,i),'b');
+%     DrawCam(focal_length, img_height, img_width, zeros(6,1) ,0.5, 'r');
+%     hold off;
+%     set(gca,'YDir','reverse');
+%     set(gca,'ZDir','reverse');
+%     axis equal;    
+%     drawnow;
+end
+
+%% Write file
+write_file('odometry_measurement', delta_pose_noise);
+write_file('plane_measurement', measurement_n);
+write_file('initial_pose',pose_gt(:,1));
+write_file('absolute_measure',absolute_measure);
+
+write_file('gt_pose', pose_gt);
+write_file('gt_measurement', measurement_gt);
+
+end
+
+function write_file(file_name, data)
+fileID = fopen(strcat(file_name, '.txt'), 'w');
+for i=1:size(data,2)
+    for j=1:size(data,1)
+        fprintf(fileID, '%8.8f', data(j,i));
+        if j<size(data,1)
+            fprintf(fileID, '\t');
+        end
+    end
+    if i<size(data,2)
+        fprintf(fileID,'\n');
+    end
+end
+fclose(fileID);
 end
 
 function pt2 = pt_transform(T, pt)
@@ -211,7 +284,7 @@ plot3([Origin(1)+state(1)+P1(1);Origin(1)+state(1)+P2(1);Origin(1)+state(1)+P4(1
     [Origin(3)+state(3)+P1(3);Origin(3)+state(3)+P2(3);Origin(3)+state(3)+P4(3);Origin(3)+state(3)+P3(3);Origin(3)+state(3)+P1(3)],Color,'LineWidth',1.5);
 end
 
-function draw_plane(state, focal_length, img_height, img_width, plane_model)
+function draw_plane(state, focal_length, img_height, img_width, plane_model,color)
 T = state2T(state);
 
 V1 = [focal_length; img_width/2; -img_height/2];
@@ -236,7 +309,7 @@ P4 = pt_transform(T, P4);
 
 Ps = [P1 P2 P3 P4 P1];
 
-plot3(Ps(1,:), Ps(2,:), Ps(3,:),'r','linewidth',2);
+plot3(Ps(1,:), Ps(2,:), Ps(3,:),color,'linewidth',2);
 
 end
 
