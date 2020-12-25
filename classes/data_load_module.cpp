@@ -34,11 +34,17 @@ void DataLoadModule::LoadData(std::string data_path){
     std::string gt_measurement_data_path = data_path+path_gt_measurement;
 
     insert_data(initial_pose, initial_pose_data_path);
+    std::cout<<"initial_pose data loaded: \t\t size["<<initial_pose.size()<<", "<<initial_pose[0].size()<<"]"<<std::endl;
     insert_data(absolute_measurement, absolute_measurement_data_path);
+    std::cout<<"absolute_measurement data loaded:\t size["<<absolute_measurement.size()<<", "<<absolute_measurement[0].size()<<"]"<<std::endl;
     insert_data(plane_measurement, plane_measurement_data_path);
+    std::cout<<"plane_measurement data loaded:\t\t size["<<plane_measurement.size()<<", "<<plane_measurement[0].size()<<"]"<<std::endl;
     insert_data(odometry_measurement, odometry_measurement_data_path);
+    std::cout<<"odometry_measurement data loaded:\t size["<<odometry_measurement.size()<<", "<<odometry_measurement[0].size()<<"]"<<std::endl;
     insert_data(gt_pose, gt_pose_data_path);
+    std::cout<<"gt_pose data loaded:\t\t\t size["<<gt_pose.size()<<", "<<gt_pose[0].size()<<"]"<<std::endl;
     insert_data(gt_measurement, gt_measurement_data_path);
+    std::cout<<"gt_measurement data loaded:\t\t size["<<gt_measurement.size()<<", "<<gt_measurement[0].size()<<"]"<<std::endl;
 
 }
 
