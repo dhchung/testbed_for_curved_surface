@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include "data_load_module.h"
+#include "plane_measure_factor.h"
+#include "surfel_node.h"
 
 DataLoadModule dlm;
 
