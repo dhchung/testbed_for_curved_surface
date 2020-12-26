@@ -15,9 +15,7 @@
 
 #include <string>
 #include <vector>
-#include "pt_cloud.h"
 #include "shader.h"
-#include "calculate_transformations.h"
 #include "camera.h"
 
 
@@ -26,9 +24,8 @@
 #include <gtsam/base/Vector.h>
 #include <gtsam/nonlinear/Values.h>
 
-#include "parameters.h"
 
-class OpenglPointProcessing{
+class OpenglRendering{
 
 private:
     std::vector<cv::Mat> imgs;
@@ -36,8 +33,8 @@ private:
 
 public:
 
-    OpenglPointProcessing(std::string window_name);
-    ~OpenglPointProcessing();
+    OpenglRendering(std::string window_name);
+    ~OpenglRendering();
 
     Shader point_shader;
     Shader plane_shader;
@@ -55,7 +52,6 @@ public:
     float lastFrame;
 
 
-    CalTransform c_trans;
 
     Camera * camera;
 
@@ -73,20 +69,13 @@ public:
     GLFWwindow * window;
     void clear_window();
 
-
-
-    void draw_point_global(std::vector<PointCloud> & global_cloud, GLfloat size);
-    void draw_point_global_double_window_test(std::vector<PointCloud> & global_cloud, GLfloat size);
-
-
     void draw_axis(float line_length, float line_width, Shader* shader);
 
     void draw_cameras(float line_length, float line_width, Shader* shader);
 
-
-    void plot_3d_points(PointCloud & pt_cld);
-    void plot_global_points(std::vector<PointCloud> & g_pt_cld, std::vector<float> & state, int & idx);
     void terminate();
+
+    void draw_surfels(std::vector<std::vector<float>> & surfels);
 
 
     glm::mat4 eigen_mat4_to_glm_mat4(Eigen::Matrix4f & e_mat4);
@@ -97,14 +86,6 @@ public:
 
     void mouse_callback_function(double xpos, double ypos);
     void scroll_callback_function(double xoffset, double yoffset);
-
-
-    void insertImages(cv::Mat & img);
-
-    void draw_plane_global(gtsam::Values & results);
-    void draw_plane_global_wo_texture(gtsam::Values & results);
-    void draw_surfels(gtsam::Values & results);
-
 
     Eigen::Matrix3f skew_symmetric(Eigen::Vector3f& vector);
 

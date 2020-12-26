@@ -9,7 +9,6 @@
 #include "surfel_node.h"
 #include "math.h"
 #include <iostream>
-#include "calculate_transformations.h"
 
 using namespace gtsam;
 using namespace surfelnode;
@@ -17,7 +16,6 @@ class PlaneMeasureFactor: public NoiseModelFactor2<Pose3, Surfel>{
 
 private:
     Vector4 measured_;
-    CalTransform c_trans;
 
 public:
     PlaneMeasureFactor(Key key1, Key key2, 

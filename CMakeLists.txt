@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(plane_based_gtsam)
 
+set(TEST_GTSAM
+    "test/test.cpp")
 
 set(SOURCE
 "src/main.cpp")
@@ -41,13 +43,28 @@ add_executable(${PROJECT_NAME}
                ${LIB_SOURCES}
                ${CLASS_SOURCES})
 
-
+add_executable(test_stuff 
+               ${TEST_GTSAM}
+               ${LIB_SOURCES}
+               ${CLASS_SOURCES})
 
 include_directories(${OPENGL_INCLUDE_DIRS} 
                     ${GLUT_INCLUDE_DIRS} 
                     ${GLM_INCLUDE_DIRS})
 
 target_link_libraries (${PROJECT_NAME} 
+                       gtsam
+                       Eigen3::Eigen
+                       ${OpenCV_LIBS}
+                       ${PCL_LIBRARIES}
+                       ${OPENGL_LIBRARIES} 
+                       ${GLUT_LIBRARIES} 
+                       glfw 
+                       ${GLEW_LIBRARIES} 
+                       ${GLM_LIBRARY_DIRS}
+                       glad ${CMAKE_DL_LIBS})
+
+target_link_libraries (test_stuff
                        gtsam
                        Eigen3::Eigen
                        ${OpenCV_LIBS}
