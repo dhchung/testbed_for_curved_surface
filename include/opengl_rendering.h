@@ -18,6 +18,7 @@
 #include "shader.h"
 #include "camera.h"
 
+#include "parameters.h"
 
 #include <opencv2/imgproc.hpp>
 #include <gtsam/base/Matrix.h>
@@ -38,6 +39,7 @@ public:
 
     Shader point_shader;
     Shader plane_shader;
+    Shader surfel_shader;
     
     unsigned int VBO, VAO, EBO;
 
@@ -71,11 +73,17 @@ public:
 
     void draw_axis(float line_length, float line_width, Shader* shader);
 
-    void draw_cameras(float line_length, float line_width, Shader* shader);
+    void draw_cameras(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader* shader);
 
     void terminate();
 
-    void draw_surfels(std::vector<std::vector<float>> & surfels);
+    void draw_surfels(std::vector<std::vector<float>> & surfels, std::vector<float> & color);
+    void draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &state0,
+                                   std::vector<Eigen::Matrix4f> &state1,
+                                   std::vector<std::vector<float>> & surfels0,
+                                   std::vector<std::vector<float>> & surfels1, 
+                                   std::vector<float> & color0,
+                                   std::vector<float> & color1);
 
 
     glm::mat4 eigen_mat4_to_glm_mat4(Eigen::Matrix4f & e_mat4);

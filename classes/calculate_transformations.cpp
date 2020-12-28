@@ -260,8 +260,8 @@ gtsam::Vector4 CalTransform::transform_plane(gtsam::Matrix4 &T1, gtsam::Vector4 
     gtsam::Matrix3 R1 = T1.block(0,0,3,3);
     gtsam::Vector3 t1 = T1.block(0,3,3,1);
 
-    gtsam::Matrix3 R2 = T1.block(0,0,3,3);
-    gtsam::Vector3 t2 = T1.block(0,3,3,1);
+    gtsam::Matrix3 R2 = T2.block(0,0,3,3);
+    gtsam::Vector3 t2 = T2.block(0,3,3,1);
 
     gtsam::Vector3 n2 = R2.transpose()*R1*n1;
     double d2 = d1 + (t2-t1).transpose()*R1*n1;
@@ -290,6 +290,19 @@ surfelnode::Surfel CalTransform::get_initial_guess(gtsam::Pose3 & pose_initial, 
     gtsam::Vector3 point(-measurement(3)/measurement(0), 0, 0);
     gtsam::Vector4 t_plane = transform_plane(T, measurement, I);
     gtsam::Vector3 t_point = transform_point(T, point);
+
+    std::cout<<"T"<<std::endl;
+    std::cout<<T<<std::endl;
+    std::cout<<"Measure"<<std::endl;
+    std::cout<<measurement<<std::endl;
+    std::cout<<"Point"<<std::endl;
+    std::cout<<point<<std::endl;
+
+    std::cout<<"t_plane"<<std::endl;
+    std::cout<<t_plane<<std::endl;
+    std::cout<<"t_point"<<std::endl;
+    std::cout<<t_point<<std::endl;
+
 
     return surfelnode::Surfel(t_plane(0), t_plane(1), t_plane(2), t_point(0), t_point(1), t_point(2));
 }
