@@ -54,6 +54,18 @@ int main(){
     s1[4] = 0.0f;
     s1[5] = 0.0f;
 
+    vector<float> s2;
+    s2.resize(6);
+    s2[0] = 0.0f;
+    s2[1] = 0.0f;
+    s2[2] = -1.0f;
+    s2[3] = 1.0f;
+    s2[4] = 0.0f;
+    s2[5] = 0.0f;
+
+    surfel_test.push_back(s1);
+    surfel_test.push_back(s2);
+
     ogl_rendering.draw_surfels(surfel_test);
 
     ogl_rendering.terminate();

@@ -201,7 +201,7 @@ Eigen::Matrix3f OpenglRendering::skew_symmetric(Eigen::Vector3f& vector){
 void OpenglRendering::draw_surfels(std::vector<std::vector<float>>& surfels){
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     std::vector<glm::mat4> circle_transformation;
     circle_transformation.resize(surfels.size());
@@ -227,7 +227,7 @@ void OpenglRendering::draw_surfels(std::vector<std::vector<float>>& surfels){
         Eigen::Vector3f p{surfels[i][3], surfels[i][4], surfels[i][5]};
         Eigen::Matrix4f T_mat;
         T_mat<<R,p,0,0,0,1;
-
+        std::cout<<T_mat<<std::endl;
         circle_transformation[i] = eigen_mat4_to_glm_mat4(T_mat);
     }
 
@@ -246,14 +246,54 @@ void OpenglRendering::draw_surfels(std::vector<std::vector<float>>& surfels){
             continue;
         }
         vertices[i*6+0] = 0.0f;
-        vertices[i*6+1] = r*cos(2.0f*float(sides)*(i-1)*M_PI);
-        vertices[i*6+2] = r*sin(2.0f*float(sides)*(i-1)*M_PI);
+        vertices[i*6+1] = r*cos(2.0f/float(sides)*(i-1)*M_PI);
+        vertices[i*6+2] = r*sin(2.0f/float(sides)*(i-1)*M_PI);
         vertices[i*6+3] = 1.0f;
         vertices[i*6+4] = 1.0f;
         vertices[i*6+5] = 0.0f;
+
+
     }
+
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    std::cout<<(int)surfels.size()<<std::endl;
+
     point_shader.use();
     while(!glfwWindowShouldClose(window)){
         processInput_end();
+        glClearColor(28.0/255.0, 40.0/255.0, 79.0/255.0, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+        projection = glm::perspective(glm::radians(camera->Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 100.0f);
+        view = camera->GetViewMatrix();
+
+        for(int i = 0; i<surfels.size(); ++i) {
+            glBindVertexArray(VAO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+            glEnableVertexAttribArray(1);
+
+            //Model and camera;
+            Eigen::Matrix4f cur_state;
+            
+            model = circle_transformation[i];
+
+            point_shader.setMat4("model", model);
+            point_shader.setMat4("view", view);
+            point_shader.setMat4("projection", projection);
+
+            glDrawArrays(GL_TRIANGLE_FAN, 0, sides+2);
+            draw_axis(2.0f, 20.0f, &point_shader);
+        }
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 }
