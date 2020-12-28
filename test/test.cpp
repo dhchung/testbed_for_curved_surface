@@ -71,9 +71,11 @@ int main(){
     //                                              measure_noise_distance).finished());
 
     noiseModel::Diagonal::shared_ptr measNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(4)<<measure_noise_normal, 
+        noiseModel::Diagonal::Sigmas((Vector(6)<<measure_noise_normal, 
                                                  measure_noise_normal, 
                                                  measure_noise_normal,
+                                                 measure_noise_distance, 
+                                                 measure_noise_distance, 
                                                  measure_noise_distance).finished());
 
 
