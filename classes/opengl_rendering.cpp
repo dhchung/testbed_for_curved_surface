@@ -528,6 +528,9 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
 
     glm::vec3 lightDir(-1.0f, 0.0f, 1.0f);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+
+    glm::vec3 objectColorGray(0.4, 0.4, 0.4);
+
     glm::vec3 objectColor0(color0[0], color0[1], color0[2]);
     glm::vec3 objectColor1(color1[0], color1[1], color1[2]);
 
@@ -551,7 +554,11 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
 
         for(int i = 0; i<surfels0.size(); ++i) {
             surfel_shader.use();
-            surfel_shader.setVec3("objectColor", objectColor0);
+            if(i==0) {
+                surfel_shader.setVec3("objectColor", objectColorGray);
+            } else {
+                surfel_shader.setVec3("objectColor", objectColor0);
+            }
             glBindVertexArray(VAO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);

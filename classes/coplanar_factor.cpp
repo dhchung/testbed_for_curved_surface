@@ -40,7 +40,6 @@ Vector CoplanarFactor::evaluateError(const Surfel& surfel1, const Surfel & surfe
     result(3) = -(surfel2.nx*surfel2.x + surfel2.ny*surfel2.y + surfel2.nz*surfel2.z) +
                 (surfel1.nx*surfel1.x + surfel1.ny*surfel1.y + surfel1.nz*surfel1.z);
 
-    result = -result;
 
     return result;
 }

@@ -17,6 +17,16 @@ namespace surfelnode{
                nx(nxi), ny(nyi), nz(nzi),
                x(xi), y(yi), z(zi){}
     Surfel(){}
+
+    void print_surfel(){
+        std::cout<<"nx: "<<nx<<std::endl;
+        std::cout<<"ny: "<<ny<<std::endl;
+        std::cout<<"nz: "<<nz<<std::endl;
+        std::cout<<"x: "<<x<<std::endl;
+        std::cout<<"y: "<<y<<std::endl;
+        std::cout<<"z: "<<z<<std::endl;
+    }
+
     };
 }
 
