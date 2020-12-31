@@ -37,11 +37,6 @@ Vector PlaneMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surfe
     if(H1){
         Matrix Dh1;
 
-        Point3 normal_in(surfel.nx, surfel.ny, surfel.nz);
-        Point3 normal_out = pose.rotation().unrotate(normal_in, Dh1);
-        std::cout<<"DH1"<<std::endl;
-        std::cout<<Dh1<<std::endl;
-
         Matrix H1_ = Matrix::Zero(4,6);
         H1_.block(0,0,3,3) = cur_sn_skew;
         // H1_(0,1) = -cur_sn(0);
@@ -76,7 +71,7 @@ Vector PlaneMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surfe
     if(H2){
         Matrix H2_ = Matrix::Zero(4,6);
         // H2_.block(0,0,3,3) = pose_R.transpose();
-        H2_.block(0,0,3,3) = pose_R;
+        H2_.block(0,0,3,3) = pose_R.transpose();
         H2_.block(3,0,1,3) = pose_t.transpose() - g_st.transpose();
         H2_.block(3,3,1,3) = -g_sn.transpose();
         // std::cout<<"H2"<<std::endl;
