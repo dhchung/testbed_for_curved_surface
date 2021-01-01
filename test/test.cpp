@@ -35,7 +35,8 @@ int main(){
 
     std::vector<float> state_0{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     std::vector<float> d_state{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/6};
-    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/5};
+    // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/5};
+    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
     
 
     NonlinearFactorGraph graph;
@@ -92,12 +93,13 @@ int main(){
     X.push_back(Symbol('x', gtsam_idx+1));
     L.push_back(Symbol('l', gtsam_idx+1));    
     
+    Pose3 d_state_pose_true = c_trans.dxyzrpy2Pose3(d_state);
     Pose3 d_state_pose3 = c_trans.dxyzrpy2Pose3(d_state2);
     Pose3 e_state = d_state_pose3;
     Surfel e_surfel = c_trans.get_initial_guess(e_state, measurement);
 
     
-    graph.add(BetweenFactor<Pose3>(X[gtsam_idx], X[gtsam_idx+1], d_state_pose3, odomNoise));
+    graph.add(BetweenFactor<Pose3>(X[gtsam_idx], X[gtsam_idx+1], d_state_pose_true, odomNoise));
     graph.add(boost::make_shared<PlaneMeasureFactor>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
     initials.insert(X[gtsam_idx+1], e_state);
     initials.insert(L[gtsam_idx+1], e_surfel);
