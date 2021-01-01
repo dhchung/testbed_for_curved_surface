@@ -35,8 +35,8 @@ int main(){
 
     std::vector<float> state_0{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     std::vector<float> d_state{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/6};
-    // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/5};
-    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
+    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/3};
+    // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
     
 
     NonlinearFactorGraph graph;
