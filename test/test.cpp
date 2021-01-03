@@ -157,8 +157,9 @@ int main(){
     std::vector<float> color0{1.0f, 1.0f, 0.0f};
     std::vector<float> color1{1.0f, 0.0f, 0.0f};
 
-    std::vector<Eigen::Matrix4f> state_optimized;
-    state_optimized.resize(X.size());
+    Eigen::Matrix4f initialize_matrix = Eigen::Matrix4f::Zero(4,4);
+
+    std::vector<Eigen::Matrix4f> state_optimized(X.size(), initialize_matrix);
     std::vector<Eigen::Matrix4f> state_initial;
     state_initial.resize(X.size());
     
@@ -166,8 +167,9 @@ int main(){
     for(int j = 0; j<X.size(); ++j) {
         Pose3 optimized_state = results.at<Pose3>(X[j]);
         Pose3 initial_state2 = initials.at<Pose3>(X[j]);
-        state_optimized[j] = c_trans.Pose32Matrix4(optimized_state);
-        state_initial[j] = c_trans.Pose32Matrix4(initial_state2);
+
+        state_optimized[j].block(0,0,4,4) = c_trans.Pose32Matrix4(optimized_state);
+        state_initial[j].block(0,0,4,4) = c_trans.Pose32Matrix4(initial_state2);
 
         std::cout<<"Initials at state "<<j<<std::endl;
         std::cout<<state_initial[j]<<std::endl;
