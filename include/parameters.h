@@ -9,11 +9,13 @@
 #define depth_err 300.0 //[mm]
 
 #define odom_noise_translation 0.05 //[m]
-#define odom_noise_angle 0.5*M_PI/180.0
+#define odom_noise_angle 0.05*M_PI/180.0
 #define init_noise_translation 0.1//[m]
 #define init_noise_angle 0.5*M_PI/180.0f
-#define measure_noise_normal 0.5
-#define measure_noise_distance 0.01//[m]
+#define measure_noise_normal 0.05
+#define measure_noise_distance 0.2//[m]
+
+#define measure_noise_angle 0.5*M_PI/180.0
 
 #define absolute_noise_translation 0.05 //[m]p
 #define absolute_noise_angle 0.5*M_PI/180.0

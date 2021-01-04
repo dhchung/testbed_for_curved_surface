@@ -49,6 +49,7 @@ public:
                               std::vector<float>* cur_state);
     
     surfelnode::Surfel get_initial_guess(gtsam::Pose3 & pose_initial, gtsam::Vector4 & measurement);
+    surfelnode::Surfel get_initial_guess(gtsam::Pose3 & pose_initial, gtsam::Vector6 & measurement);
 
     gtsam::Pose3 dxyzrpy2Pose3(std::vector<float> &dstate);
 

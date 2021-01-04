@@ -73,7 +73,9 @@ public:
 
     void draw_axis(float line_length, float line_width, Shader* shader);
 
-    void draw_cameras(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader* shader);
+    void draw_camera(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader* shader);
+    void draw_arrow(glm::mat4 &model_T, float line_length, float arrow_length, float line_width, std::vector<float> &color, Shader* shader);
+
 
     void terminate();
 

@@ -34,104 +34,47 @@ Vector PlaneMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surfe
     expected(3) = g_sn.transpose()*(pose_t - g_st);
 
 
+    gtsam::Matrix H1_test;
+    gtsam::Matrix H2_test;
+
+    gtsam::Point3 normal_in(surfel.nx, surfel.ny, surfel.nz);
+    gtsam::Point3 normal_out = pose.rotation().unrotate(normal_in, H1_test, H2_test);
+
+
     if(H1){
-        Matrix Dh1;
-
         Matrix H1_ = Matrix::Zero(4,6);
-        H1_.block(0,0,3,3) = cur_sn_skew;
-        // H1_(0,1) = -cur_sn(0);
-        // H1_(0,2) = cur_sn(1);
-        // H1_(1,0) = cur_sn(0);
-        // H1_(1,2) = -cur_sn(2);
-        // H1_(2,0) = -cur_sn(1);
-        // H1_(2,1) = cur_sn(2);
+        // H1_.block(0,0,3,3) = cur_sn_skew;
+        H1_.block(0,0,3,3) = H1_test;
         H1_.block(3,3,1,3) = g_sn.transpose();
-        // H1_.block(3,3,1,3) = g_sn.transpose()*pose_R;
-
-        std::cout<<"H1"<<std::endl;
-        std::cout<<H1_<<std::endl;
-
-        std::cout<<"g_sn"<<std::endl;
-        std::cout<<g_sn.transpose()<<std::endl;
-        std::cout<<"g_st"<<std::endl;
-        std::cout<<g_st.transpose()<<std::endl;
-
-        std::cout<<"pose_R"<<std::endl;
-        std::cout<<pose_R<<std::endl;
-        std::cout<<"pose_t"<<std::endl;
-        std::cout<<pose_t.transpose()<<std::endl;
-
-        std::cout<<"measure_n"<<std::endl;
-        std::cout<<measure_n<<std::endl;
-        
-        std::cout<<"measure_d"<<std::endl;
-        std::cout<<measure_d<<std::endl;
+        std::cout<<"TestH1"<<std::endl;
+        std::cout<<H1_.block(0,0,3,3) - H1_test<<std::endl;        
         *H1 = H1_;
     }
     if(H2){
         Matrix H2_ = Matrix::Zero(4,6);
-        // H2_.block(0,0,3,3) = pose_R.transpose();
         H2_.block(0,0,3,3) = pose_R.transpose();
         H2_.block(3,0,1,3) = pose_t.transpose() - g_st.transpose();
         H2_.block(3,3,1,3) = -g_sn.transpose();
-        // std::cout<<"H2"<<std::endl;
-        // std::cout<<H2_<<std::endl;
 
-        // std::cout<<"g_sn"<<std::endl;
-        // std::cout<<g_sn.transpose()<<std::endl;
-        // std::cout<<"g_st"<<std::endl;
-        // std::cout<<g_st.transpose()<<std::endl;
-
-        // std::cout<<"pose_R"<<std::endl;
-        // std::cout<<pose_R<<std::endl;
-        // std::cout<<"pose_t"<<std::endl;
-        // std::cout<<pose_t.transpose()<<std::endl;
-
-        // std::cout<<"measure_n"<<std::endl;
-        // std::cout<<measure_n<<std::endl;
-        
-        // std::cout<<"measure_d"<<std::endl;
-        // std::cout<<measure_d<<std::endl;
-
-
+        std::cout<<"TestH2"<<std::endl;
+        std::cout<<H2_.block(0,0,3,3) - H2_test<<std::endl;
 
         *H2 = H2_;
     }
 
-
-    // std::cout<<"___not in H"<<std::endl;
-
-    // std::cout<<"g_sn"<<std::endl;
-    // std::cout<<g_sn.transpose()<<std::endl;
-    // std::cout<<"g_st"<<std::endl;
-    // std::cout<<g_st.transpose()<<std::endl;
-
-    // std::cout<<"pose_R"<<std::endl;
-    // std::cout<<pose_R<<std::endl;
-    // std::cout<<"pose_t"<<std::endl;
-    // std::cout<<pose_t.transpose()<<std::endl;
-
-    // std::cout<<"measure_n"<<std::endl;
-    // std::cout<<measure_n<<std::endl;
-    
-    // std::cout<<"measure_d"<<std::endl;
-    // std::cout<<measure_d<<std::endl;
-
-
-
     Vector4 result;
     result = expected - measured_;
     
-    std::cout<<"Result"<<std::endl;
-    std::cout<<result<<std::endl;
+    // std::cout<<"Result"<<std::endl;
+    // std::cout<<result<<std::endl;
 
-    std::cout<<"Expected"<<std::endl;
-    std::cout<<expected<<std::endl;
+    // std::cout<<"Expected"<<std::endl;
+    // std::cout<<expected<<std::endl;
 
-    std::cout<<"measured"<<std::endl;
-    std::cout<<measured_<<std::endl;
+    // std::cout<<"measured"<<std::endl;
+    // std::cout<<measured_<<std::endl;
 
-    std::cout<<"---------------------"<<std::endl;
+    // std::cout<<"---------------------"<<std::endl;
     return result;
 
 

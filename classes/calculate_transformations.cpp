@@ -291,13 +291,22 @@ surfelnode::Surfel CalTransform::get_initial_guess(gtsam::Pose3 & pose_initial, 
     gtsam::Vector4 t_plane = transform_plane(T, measurement, I);
     gtsam::Vector3 t_point = transform_point(T, point);
 
-    std::cout<<"t_plane"<<std::endl;
-    std::cout<<t_plane<<std::endl;
-    std::cout<<"t_point"<<std::endl;
-    std::cout<<t_point<<std::endl;
-
     return surfelnode::Surfel(t_plane(0), t_plane(1), t_plane(2), t_point(0), t_point(1), t_point(2));
 }
+
+surfelnode::Surfel CalTransform::get_initial_guess(gtsam::Pose3 & pose_initial, gtsam::Vector6 & measurement){
+    gtsam::Matrix4 I = gtsam::Matrix4::Identity(4,4);
+    gtsam::Matrix4 T = gtsam::Matrix4::Identity(4,4);
+    T.block(0,0,3,3) = pose_initial.rotation().matrix();
+    T.block(0,3,3,1) = pose_initial.translation().matrix();
+    gtsam::Vector3 point = measurement.segment(3,3);
+    gtsam::Vector3 t_normal = T.block(0,0,3,3)*measurement.segment(0,3);
+    gtsam::Vector3 t_point = transform_point(T, point);
+
+    return surfelnode::Surfel(t_normal(0), t_normal(1), t_normal(2), t_point(0), t_point(1), t_point(2));
+}
+
+
 
 gtsam::Pose3 CalTransform::dxyzrpy2Pose3(std::vector<float> &dstate){
     double dx =     (double) dstate[0];

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(plane_based_gtsam)
 
 set(TEST_GTSAM
-    "test/test.cpp")
+    "test/test2.cpp")
 
 set(SOURCE
 "src/main.cpp")

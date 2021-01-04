@@ -2,7 +2,7 @@
 #include "calculate_transformations.h"
 #include "opengl_rendering.h"
 #include "data_load_module.h"
-#include "plane_measure_factor.h"
+#include "plane_measure_factor_test.h"
 #include "surfel_node.h"
 #include "parameters.h"
 #include "coplanar_factor.h"
@@ -35,7 +35,7 @@ int main(){
 
     std::vector<float> state_0{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     std::vector<float> d_state{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/6};
-    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/3};
+    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0*M_PI/3};
     // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
     
 
@@ -73,21 +73,23 @@ int main(){
     //                                              measure_noise_distance).finished());
 
     noiseModel::Diagonal::shared_ptr measNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(4)<<measure_noise_normal, 
+        noiseModel::Diagonal::Sigmas((Vector(6)<<measure_noise_normal, 
                                                  measure_noise_normal, 
                                                  measure_noise_normal,
+                                                 measure_noise_distance,
+                                                 measure_noise_distance,
                                                  measure_noise_distance).finished());
 
 
-    Vector4 measurement;
-    measurement<<-1.0, 0.0, 0.0, 1.0;
+    Vector6 measurement;
+    measurement<<-1.0, 0.0, 0.0, 1.0, 0.0, 0.0;
 
 
     X.push_back(Symbol('x', gtsam_idx));
     L.push_back(Symbol('l', gtsam_idx));
     Pose3 prior_state = c_trans.dxyzrpy2Pose3(state_0);
     graph.add(PriorFactor<Pose3>(X[gtsam_idx], prior_state, priorNoise));
-    graph.add(boost::make_shared<PlaneMeasureFactor>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
+    graph.add(boost::make_shared<PlaneMeasureFactorTest>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
     initials.insert(X[gtsam_idx], prior_state);
     initials.insert(L[gtsam_idx], c_trans.get_initial_guess(prior_state, measurement));
 
@@ -101,7 +103,7 @@ int main(){
 
     
     graph.add(BetweenFactor<Pose3>(X[gtsam_idx], X[gtsam_idx+1], d_state_pose_true, odomNoise));
-    graph.add(boost::make_shared<PlaneMeasureFactor>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
+    graph.add(boost::make_shared<PlaneMeasureFactorTest>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
     initials.insert(X[gtsam_idx+1], e_state);
     initials.insert(L[gtsam_idx+1], e_surfel);
 
@@ -148,10 +150,10 @@ int main(){
                                                 (float)optimized_surfel.z};
         surfel_optimized.push_back(surfel_optimized_now);
 
-        // std::cout<<"Initial Surfel at "<<i<<std::endl;
-        // initial_surfel.print_surfel();
-        // std::cout<<"Optimized Surfel at "<<i<<std::endl;
-        // optimized_surfel.print_surfel();
+        std::cout<<"Initial Surfel at "<<i<<std::endl;
+        initial_surfel.print_surfel();
+        std::cout<<"Optimized Surfel at "<<i<<std::endl;
+        optimized_surfel.print_surfel();
 
     }
 
@@ -172,10 +174,10 @@ int main(){
         state_optimized[j].block(0,0,4,4) = c_trans.Pose32Matrix4(optimized_state);
         state_initial[j].block(0,0,4,4) = c_trans.Pose32Matrix4(initial_state2);
 
-        // std::cout<<"Initials at state "<<j<<std::endl;
-        // std::cout<<state_initial[j]<<std::endl;
-        // std::cout<<"Finals at state "<<j<<std::endl;
-        // std::cout<<state_optimized[j]<<std::endl;
+        std::cout<<"Initials at state "<<j<<std::endl;
+        std::cout<<state_initial[j]<<std::endl;
+        std::cout<<"Finals at state "<<j<<std::endl;
+        std::cout<<state_optimized[j]<<std::endl;
     }
 
     ogl_rendering.init_opengl();

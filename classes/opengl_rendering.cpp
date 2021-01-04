@@ -121,7 +121,7 @@ void OpenglRendering::draw_axis(float line_length, float line_width, Shader * sh
     
 }
 
-void OpenglRendering::draw_cameras(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader * shader){
+void OpenglRendering::draw_camera(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader * shader){
 
     float x = line_length;
     float y = img_center_x/focal_length*line_length;
@@ -152,13 +152,6 @@ void OpenglRendering::draw_cameras(glm::mat4 &model_T, float line_length, float 
 
         x, y, z,                            color[0], color[1], color[2],
         x, y, -z,                           color[0], color[1], color[2]
-
-
-        // 0.0f, 0.0f, 0.0f,                   color[0], color[1], color[2],//v0
-        // x, y, -z,                           color[0], color[1], color[2],
-        // x, -y, -z,                          color[0], color[1], color[2]
-
-
     };
     
 
@@ -181,6 +174,40 @@ void OpenglRendering::draw_cameras(glm::mat4 &model_T, float line_length, float 
 }
 
 
+void OpenglRendering::draw_arrow(glm::mat4 &model_T, float line_length, float arrow_length, float line_width, std::vector<float> &color, Shader * shader){
+
+    float arrow_sqrt = arrow_length / sqrt(2.0f);
+    float arrow_short = line_length - arrow_sqrt;
+
+    float vertices[]{
+        0.0f, 0.0f, 0.0f,                   color[0], color[1], color[2],//v0
+        line_length, 0.0f, 0.0f,            color[0], color[1], color[2],
+
+        line_length, 0.0f, 0.0f,            color[0], color[1], color[2],//v0
+        arrow_short, arrow_sqrt, 0,         color[0], color[1], color[2],
+
+        line_length, 0.0f, 0.0f,            color[0], color[1], color[2],//v0
+        arrow_short, -arrow_sqrt, 0,        color[0], color[1], color[2]
+    };
+    
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    glm::mat4 model = model_T;
+
+    shader->setMat4("model", model);
+
+    glLineWidth(line_width);
+    // glDrawElements(GL_LINES, 6, GL_UNSIGNED_BYTE, 0);
+    glDrawArrays(GL_LINES, 0, 16);
+}
 
 
 
@@ -594,7 +621,8 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.use();
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
-            draw_cameras(state, 0.2f, 5.0f, cam_color0, &point_shader);
+            draw_camera(state, 0.2f, 5.0f, cam_color0, &point_shader);
+            draw_arrow(model, 1.0f, 0.2f, 5.0f, cam_color0, &point_shader);
         }
 
 
@@ -640,7 +668,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.use();
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
-            draw_cameras(state, 0.2f, 5.0f, cam_color1, &point_shader);
+            draw_camera(state, 0.2f, 5.0f, cam_color1, &point_shader);
 
 
         }
