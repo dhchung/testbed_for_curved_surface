@@ -18,7 +18,7 @@
 #include "shader.h"
 #include "camera.h"
 
-#include "parameters.h"
+#include "parameters_json.h"
 
 #include <opencv2/imgproc.hpp>
 #include <gtsam/base/Matrix.h>
@@ -33,6 +33,8 @@ private:
 
 
 public:
+
+    Params params;
 
     OpenglRendering(std::string window_name);
     ~OpenglRendering();

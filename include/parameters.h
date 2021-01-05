@@ -1,5 +1,4 @@
 #pragma once
-
 #include <math.h>
 
 #define base_line 120.0 //[mm]

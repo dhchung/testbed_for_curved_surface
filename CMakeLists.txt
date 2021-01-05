@@ -30,6 +30,8 @@ include_directories(${Boost_INCLUDE_DIR})
 
 find_package(OpenCV REQUIRED)
 
+find_package(jsoncpp REQUIRED)
+
 #OpenGL
 add_subdirectory(glad/)
 set(LIB_SOURCES glad/src/glad.c)
@@ -74,4 +76,5 @@ target_link_libraries (test_stuff
                        glfw 
                        ${GLEW_LIBRARIES} 
                        ${GLM_LIBRARY_DIRS}
-                       glad ${CMAKE_DL_LIBS})
+                       glad ${CMAKE_DL_LIBS}
+                       jsoncpp)

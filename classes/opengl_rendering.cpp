@@ -124,9 +124,8 @@ void OpenglRendering::draw_axis(float line_length, float line_width, Shader * sh
 void OpenglRendering::draw_camera(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader * shader){
 
     float x = line_length;
-    float y = img_center_x/focal_length*line_length;
-    float z = img_center_y/focal_length*line_length;
-
+    float y = params.camParam.img_center_x/params.camParam.focal_length*line_length;
+    float z = params.camParam.img_center_y/params.camParam.focal_length*line_length;
 
     float vertices[]{
         0.0f, 0.0f, 0.0f,                   color[0], color[1], color[2],//v0
@@ -303,7 +302,7 @@ void OpenglRendering::draw_surfels(std::vector<std::vector<float>>& surfels,  st
     normals.resize(surfels.size());
 
     for(int i=0; i<surfels.size(); ++i) {
-        Eigen::Vector3f a{-1.0f, 0.0f, 0.0f};
+        Eigen::Vector3f a{1.0f, 0.0f, 0.0f};
         Eigen::Vector3f b{surfels[i][0], surfels[i][1], surfels[i][2]};
         Eigen::Vector3f v = skew_symmetric(a)*b;
 
@@ -311,7 +310,14 @@ void OpenglRendering::draw_surfels(std::vector<std::vector<float>>& surfels,  st
         Eigen::Matrix3f R;
 
         if(s2==0) {
-            R = Eigen::Matrix3f::Identity(3,3);
+            Eigen::Vector3f diff = a-b;
+            if(diff.transpose()*diff < 0.1){
+                R = Eigen::Matrix3f::Identity(3,3);
+            }else{
+                R = Eigen::Matrix3f::Identity(3,3);
+                R(0,0) = -1.0f;
+                R(1,1) = -1.0f;
+            }
         } else {
             float s = sqrt(v.transpose()*v);
             float c = a.transpose()*b;
@@ -458,7 +464,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
     normals1.resize(surfels1.size());
 
     for(int i=0; i<surfels0.size(); ++i) {
-        Eigen::Vector3f a{-1.0f, 0.0f, 0.0f};
+        Eigen::Vector3f a{1.0f, 0.0f, 0.0f};
         Eigen::Vector3f b{surfels0[i][0], surfels0[i][1], surfels0[i][2]};
         b = b/(sqrt(b.transpose()*b));
         Eigen::Vector3f v = skew_symmetric(a)*b;
@@ -467,7 +473,14 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
         Eigen::Matrix3f R;
 
         if(s2==0) {
-            R = Eigen::Matrix3f::Identity(3,3);
+            Eigen::Vector3f diff = a-b;
+            if(diff.transpose()*diff < 0.1){
+                R = Eigen::Matrix3f::Identity(3,3);
+            }else{
+                R = Eigen::Matrix3f::Identity(3,3);
+                R(0,0) = -1.0f;
+                R(1,1) = -1.0f;
+            }
         } else {
             float s = sqrt(v.transpose()*v);
             float c = a.transpose()*b;
@@ -488,7 +501,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
     }
 
     for(int i=0; i<surfels1.size(); ++i) {
-        Eigen::Vector3f a{-1.0f, 0.0f, 0.0f};
+        Eigen::Vector3f a{1.0f, 0.0f, 0.0f};
         Eigen::Vector3f b{surfels1[i][0], surfels1[i][1], surfels1[i][2]};
         Eigen::Vector3f v = skew_symmetric(a)*b;
 
@@ -496,7 +509,14 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
         Eigen::Matrix3f R;
 
         if(s2==0) {
-            R = Eigen::Matrix3f::Identity(3,3);
+            Eigen::Vector3f diff = a-b;
+            if(diff.transpose()*diff < 0.1){
+                R = Eigen::Matrix3f::Identity(3,3);
+            }else{
+                R = Eigen::Matrix3f::Identity(3,3);
+                R(0,0) = -1.0f;
+                R(1,1) = -1.0f;
+            }
         } else {
             float s = sqrt(v.transpose()*v);
             float c = a.transpose()*b;
@@ -622,7 +642,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
             draw_camera(state, 0.2f, 5.0f, cam_color0, &point_shader);
-            draw_arrow(model, 1.0f, 0.2f, 5.0f, cam_color0, &point_shader);
+            draw_arrow(model, 0.5f, 0.2f, 5.0f, cam_color0, &point_shader);
         }
 
 
@@ -669,6 +689,8 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
             draw_camera(state, 0.2f, 5.0f, cam_color1, &point_shader);
+            model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
+            draw_arrow(model, 0.5f, 0.2f, 5.0f, cam_color1, &point_shader);
 
 
         }

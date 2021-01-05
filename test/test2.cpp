@@ -4,7 +4,7 @@
 #include "data_load_module.h"
 #include "plane_measure_factor_test.h"
 #include "surfel_node.h"
-#include "parameters.h"
+#include "parameters_json.h"
 #include "coplanar_factor.h"
 
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
@@ -17,12 +17,20 @@
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
 #include <gtsam/nonlinear/Marginals.h>
 
+#include <jsoncpp/json/json.h>
+#include <fstream>
+
 OpenglRendering ogl_rendering("3D Point Cloud (non-sequential)");
 
 CalTransform c_trans;
 using namespace std;
 using namespace gtsam;
 int main(){
+    Params params;
+    std::string param_dir = "./include/parameters.json";
+    params.read_data(param_dir);
+
+    params.SLAMParam.PrintStuff();
 
     //Testing for two surfels
     //yaw change with same plane measures
@@ -49,20 +57,20 @@ int main(){
     int gtsam_idx = 0;
 
     noiseModel::Diagonal::shared_ptr priorNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(6)<<init_noise_angle, 
-                                                 init_noise_angle, 
-                                                 init_noise_angle,
-                                                 init_noise_translation, 
-                                                 init_noise_translation, 
-                                                 init_noise_translation).finished());
+        noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.init_noise_angle, 
+                                                 params.SLAMParam.init_noise_angle, 
+                                                 params.SLAMParam.init_noise_angle,
+                                                 params.SLAMParam.init_noise_translation, 
+                                                 params.SLAMParam.init_noise_translation, 
+                                                 params.SLAMParam.init_noise_translation).finished());
 
     noiseModel::Diagonal::shared_ptr odomNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(6)<<odom_noise_angle, 
-                                                 odom_noise_angle, 
-                                                 odom_noise_angle,
-                                                 odom_noise_translation, 
-                                                 odom_noise_translation, 
-                                                 odom_noise_translation).finished());
+        noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.odom_noise_angle, 
+                                                 params.SLAMParam.odom_noise_angle, 
+                                                 params.SLAMParam.odom_noise_angle,
+                                                 params.SLAMParam.odom_noise_translation, 
+                                                 params.SLAMParam.odom_noise_translation, 
+                                                 params.SLAMParam.odom_noise_translation).finished());
 
     // noiseModel::Diagonal::shared_ptr measNoise = 
     //     noiseModel::Diagonal::Sigmas((Vector(6)<<measure_noise_normal, 
@@ -73,12 +81,12 @@ int main(){
     //                                              measure_noise_distance).finished());
 
     noiseModel::Diagonal::shared_ptr measNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(6)<<measure_noise_normal, 
-                                                 measure_noise_normal, 
-                                                 measure_noise_normal,
-                                                 measure_noise_distance,
-                                                 measure_noise_distance,
-                                                 measure_noise_distance).finished());
+        noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.measure_noise_normal, 
+                                                 params.SLAMParam.measure_noise_normal, 
+                                                 params.SLAMParam.measure_noise_normal,
+                                                 params.SLAMParam.measure_noise_distance,
+                                                 params.SLAMParam.measure_noise_distance,
+                                                 params.SLAMParam.measure_noise_distance).finished());
 
 
     Vector6 measurement;
@@ -112,8 +120,8 @@ int main(){
 
 
 
-    double meas_noise_n = measure_noise_normal/200;
-    double meas_noise_d = measure_noise_distance/200;    
+    double meas_noise_n = params.SLAMParam.measure_noise_normal/200;
+    double meas_noise_d = params.SLAMParam.measure_noise_distance/200;    
 
     gtsam::noiseModel::Diagonal::shared_ptr measNoise_d = 
         gtsam::noiseModel::Diagonal::Sigmas((gtsam::Vector(4)<<meas_noise_n,

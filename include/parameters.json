@@ -1,0 +1,60 @@
+{
+    "camera_params": [
+        {
+            "name" : "base_line",
+            "value" : 120.0
+        },
+        {
+            "name" : "img_center_x",
+            "value" : 236.0
+        },
+        {
+            "name" : "img_center_y",
+            "value" : 172.0
+        },
+        {
+            "name" : "focal_length",
+            "value" : 526.0
+        },
+        {
+            "name" : "depth_err",
+            "value" : 300.0
+        }
+    ],
+
+    "slam_params": [
+        {
+            "name" : "odom_noise_translation",
+            "value" : 0.05
+        },
+        {
+            "name" : "odom_noise_angle",
+            "value" : 0.05
+        },
+        {
+            "name" : "init_noise_translation",
+            "value" : 0.001
+        },
+        {
+            "name" : "init_noise_angle",
+            "value" : 0.005
+        },
+        {
+            "name" : "measure_noise_normal",
+            "value" : 0.05
+        },
+        {
+            "name" : "measure_noise_distance",
+            "value" : 0.02
+        },
+        {
+            "name" : "absolute_noise_translation",
+            "value" : 0.05
+        },
+        {
+            "name" : "absolute_noise_angle",
+            "value" : 0.5
+        }
+    ]
+
+}

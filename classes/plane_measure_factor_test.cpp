@@ -62,14 +62,12 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
         Matrix H2_ = Matrix::Zero(6,6);
         H2_.block(0,0,3,3) = pose_R.transpose();
         H2_.block(3,3,3,3) = pose_R.transpose();
-        // H2_.block(3,3,1,3) = -g_sn.transpose();
 
         *H2 = H2_;
     }
 
     Vector6 result;
     result = expected - measured_;
-    // result = measured_ - expected;
 
     std::cout<<"result"<<std::endl;
     std::cout<<result<<std::endl;
