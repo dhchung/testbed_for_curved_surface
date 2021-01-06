@@ -5,7 +5,7 @@ set(TEST_GTSAM
     "test/test2.cpp")
 
 set(SOURCE
-"src/main.cpp")
+    "src/main.cpp")
 
 file(GLOB CLASS_SOURCES
      "classes/*.cpp"
@@ -64,7 +64,8 @@ target_link_libraries (${PROJECT_NAME}
                        glfw 
                        ${GLEW_LIBRARIES} 
                        ${GLM_LIBRARY_DIRS}
-                       glad ${CMAKE_DL_LIBS})
+                       glad ${CMAKE_DL_LIBS}
+                       jsoncpp)
 
 target_link_libraries (test_stuff
                        gtsam

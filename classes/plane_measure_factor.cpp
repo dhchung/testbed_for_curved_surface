@@ -46,8 +46,6 @@ Vector PlaneMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surfe
         // H1_.block(0,0,3,3) = cur_sn_skew;
         H1_.block(0,0,3,3) = H1_test;
         H1_.block(3,3,1,3) = g_sn.transpose();
-        std::cout<<"TestH1"<<std::endl;
-        std::cout<<H1_.block(0,0,3,3) - H1_test<<std::endl;        
         *H1 = H1_;
     }
     if(H2){
@@ -55,72 +53,12 @@ Vector PlaneMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surfe
         H2_.block(0,0,3,3) = pose_R.transpose();
         H2_.block(3,0,1,3) = pose_t.transpose() - g_st.transpose();
         H2_.block(3,3,1,3) = -g_sn.transpose();
-
-        std::cout<<"TestH2"<<std::endl;
-        std::cout<<H2_.block(0,0,3,3) - H2_test<<std::endl;
-
         *H2 = H2_;
     }
 
     Vector4 result;
     result = expected - measured_;
-    
-    // std::cout<<"Result"<<std::endl;
-    // std::cout<<result<<std::endl;
-
-    // std::cout<<"Expected"<<std::endl;
-    // std::cout<<expected<<std::endl;
-
-    // std::cout<<"measured"<<std::endl;
-    // std::cout<<measured_<<std::endl;
-
-    // std::cout<<"---------------------"<<std::endl;
     return result;
-
-
-
-
-    //Measurement to global
-
-    // Vector6 expected;
-    // expected<<surfel.nx, surfel.ny, surfel.nz, surfel.x, surfel.y, surfel.z;
-
-    // Vector3 local_coord(-measure_d/measure_n(0), 0.0, 0.0);
-
-
-    // Vector6 measured;
-    // measured.segment(0,3) = pose_R*measure_n;
-    // measured.segment(3,3) = pose_R*local_coord + pose_t;
-
-
-    // if(H1){
-    //     Matrix H1_ = Matrix::Zero(6,6);
-    //     // H1_.block(0,0,3,3) = pose_R*skewsym_matrix(measure_n);
-    //     // H1_.block(0,3,3,3) = pose_R*skewsym_matrix(local_coord);
-    //     H1_.block(0,0,3,3) = pose_R*skewsym_matrix(measure_n);
-    //     H1_.block(0,3,3,3) = pose_R*skewsym_matrix(local_coord);
-    //     H1_.block(3,3,3,3) = Matrix::Identity(3,3);
-    //     *H1 = H1_;
-    // }
-    // if(H2){
-    //     Matrix H2_ = Matrix::Zero(6,6);
-    //     H2_ = Matrix::Identity(6,6);
-    //     *H2 = H2_;
-    // }
-
-    // Vector6 result;
-    // result = expected - measured;
-    // std::cout<<"Result"<<std::endl;
-    // std::cout<<result<<std::endl;
-
-    // std::cout<<"Expected"<<std::endl;
-    // std::cout<<expected<<std::endl;
-
-    // std::cout<<"measured"<<std::endl;
-    // std::cout<<measured<<std::endl;
-    // return result;
-
-
 }
 
 gtsam::Matrix3 PlaneMeasureFactor::skewsym_matrix(gtsam::Vector3 & vec) const{

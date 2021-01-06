@@ -20,7 +20,8 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
     Vector3 g_st(surfel.x, surfel.y, surfel.z);
 
     Matrix3 pose_R = pose.rotation().matrix();
-    Vector3 pose_t(pose.x(), pose.y(), pose.z());
+    Vector3 pose_t = pose.translation().matrix();
+    
 
     Vector3 cur_sn = pose_R.transpose()*g_sn;
     Matrix3 cur_sn_skew = skewsym_matrix(cur_sn);
@@ -52,9 +53,9 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
 
     if(H1){
         Matrix H1_ = Matrix::Zero(6,6);
-        H1_.block(0,0,3,3) = -cur_sn_skew;
-        H1_.block(3,0,3,3) = -cur_st_skew;
-        H1_.block(3,3,3,3) = pose_R.transpose();
+        H1_.block(0,0,3,3) = cur_sn_skew;
+        H1_.block(3,0,3,3) = cur_st_skew;
+        H1_.block(3,3,3,3) = -pose_R.transpose();
 
         *H1 = H1_;
     }
@@ -68,9 +69,6 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
 
     Vector6 result;
     result = expected - measured_;
-
-    std::cout<<"result"<<std::endl;
-    std::cout<<result<<std::endl;
     return result;
     
 }

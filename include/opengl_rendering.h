@@ -33,9 +33,6 @@ private:
 
 
 public:
-
-    Params params;
-
     OpenglRendering(std::string window_name);
     ~OpenglRendering();
 
@@ -75,7 +72,7 @@ public:
 
     void draw_axis(float line_length, float line_width, Shader* shader);
 
-    void draw_camera(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader* shader);
+    void draw_camera(Params & params, glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader* shader);
     void draw_arrow(glm::mat4 &model_T, float line_length, float arrow_length, float line_width, std::vector<float> &color, Shader* shader);
 
 
@@ -87,7 +84,8 @@ public:
                                    std::vector<std::vector<float>> & surfels0,
                                    std::vector<std::vector<float>> & surfels1, 
                                    std::vector<float> & color0,
-                                   std::vector<float> & color1);
+                                   std::vector<float> & color1,
+                                   Params & params);
 
 
     glm::mat4 eigen_mat4_to_glm_mat4(Eigen::Matrix4f & e_mat4);

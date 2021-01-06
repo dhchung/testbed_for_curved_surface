@@ -41,7 +41,7 @@
         },
         {
             "name" : "measure_noise_normal",
-            "value" : 0.05
+            "value" : 0.02
         },
         {
             "name" : "measure_noise_distance",

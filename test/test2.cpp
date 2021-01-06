@@ -15,6 +15,7 @@
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/Marginals.h>
 
 #include <jsoncpp/json/json.h>
@@ -30,6 +31,8 @@ int main(){
     std::string param_dir = "./include/parameters.json";
     params.read_data(param_dir);
 
+
+    params.camParam.PrintStuff();
     params.SLAMParam.PrintStuff();
 
     //Testing for two surfels
@@ -72,14 +75,6 @@ int main(){
                                                  params.SLAMParam.odom_noise_translation, 
                                                  params.SLAMParam.odom_noise_translation).finished());
 
-    // noiseModel::Diagonal::shared_ptr measNoise = 
-    //     noiseModel::Diagonal::Sigmas((Vector(6)<<measure_noise_normal, 
-    //                                              measure_noise_normal, 
-    //                                              measure_noise_normal,
-    //                                              measure_noise_distance, 
-    //                                              measure_noise_distance, 
-    //                                              measure_noise_distance).finished());
-
     noiseModel::Diagonal::shared_ptr measNoise = 
         noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.measure_noise_normal, 
                                                  params.SLAMParam.measure_noise_normal, 
@@ -119,20 +114,8 @@ int main(){
     // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess(prior_state, measurement));
 
 
-
-    double meas_noise_n = params.SLAMParam.measure_noise_normal/200;
-    double meas_noise_d = params.SLAMParam.measure_noise_distance/200;    
-
-    gtsam::noiseModel::Diagonal::shared_ptr measNoise_d = 
-        gtsam::noiseModel::Diagonal::Sigmas((gtsam::Vector(4)<<meas_noise_n,
-                                                                meas_noise_n,
-                                                                meas_noise_n,
-                                                                meas_noise_d).finished());
-
-    // graph.add(boost::make_shared<CoplanarFactor>(L[gtsam_idx], L[gtsam_idx+1], measNoise_d)); 
-
-
     results = LevenbergMarquardtOptimizer(graph, initials).optimize();
+    // results = GaussNewtonOptimizer(graph, initials).optimize();
 
 
     std::vector<std::vector<float>> surfel_optimized;
@@ -179,6 +162,9 @@ int main(){
         Pose3 optimized_state = results.at<Pose3>(X[j]);
         Pose3 initial_state2 = initials.at<Pose3>(X[j]);
 
+        std::cout<<"Yaw"<<std::endl;
+        std::cout<<optimized_state.rotation().yaw()*180.0/M_PI<<std::endl;
+
         state_optimized[j].block(0,0,4,4) = c_trans.Pose32Matrix4(optimized_state);
         state_initial[j].block(0,0,4,4) = c_trans.Pose32Matrix4(initial_state2);
 
@@ -186,6 +172,7 @@ int main(){
         std::cout<<state_initial[j]<<std::endl;
         std::cout<<"Finals at state "<<j<<std::endl;
         std::cout<<state_optimized[j]<<std::endl;
+
     }
 
     ogl_rendering.init_opengl();
@@ -194,7 +181,8 @@ int main(){
                                             surfel_optimized, 
                                             surfel_initial, 
                                             color0, 
-                                            color1);
+                                            color1,
+                                            params);
     ogl_rendering.terminate();
 
     return 0;

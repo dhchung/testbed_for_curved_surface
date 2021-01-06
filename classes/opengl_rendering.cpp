@@ -121,7 +121,7 @@ void OpenglRendering::draw_axis(float line_length, float line_width, Shader * sh
     
 }
 
-void OpenglRendering::draw_camera(glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader * shader){
+void OpenglRendering::draw_camera(Params & params, glm::mat4 &model_T, float line_length, float line_width, std::vector<float> &color, Shader * shader){
 
     float x = line_length;
     float y = params.camParam.img_center_x/params.camParam.focal_length*line_length;
@@ -168,7 +168,6 @@ void OpenglRendering::draw_camera(glm::mat4 &model_T, float line_length, float l
     shader->setMat4("model", model);
 
     glLineWidth(line_width);
-    // glDrawElements(GL_LINES, 6, GL_UNSIGNED_BYTE, 0);
     glDrawArrays(GL_LINES, 0, 16);
 }
 
@@ -205,12 +204,8 @@ void OpenglRendering::draw_arrow(glm::mat4 &model_T, float line_length, float ar
 
     glLineWidth(line_width);
     // glDrawElements(GL_LINES, 6, GL_UNSIGNED_BYTE, 0);
-    glDrawArrays(GL_LINES, 0, 16);
+    glDrawArrays(GL_LINES, 0, 6);
 }
-
-
-
-
 
 void OpenglRendering::processInput_end(){
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -445,7 +440,8 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
                                                 std::vector<std::vector<float>>& surfels0,
                                                 std::vector<std::vector<float>>& surfels1,
                                                 std::vector<float> & color0,
-                                                std::vector<float> & color1){
+                                                std::vector<float> & color1,
+                                                Params & params){
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -641,7 +637,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.use();
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
-            draw_camera(state, 0.2f, 5.0f, cam_color0, &point_shader);
+            draw_camera(params, state, 0.2f, 5.0f, cam_color0, &point_shader);
             draw_arrow(model, 0.5f, 0.2f, 5.0f, cam_color0, &point_shader);
         }
 
@@ -688,7 +684,7 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
             point_shader.use();
             point_shader.setMat4("view", view);
             point_shader.setMat4("projection", projection);
-            draw_camera(state, 0.2f, 5.0f, cam_color1, &point_shader);
+            draw_camera(params, state, 0.2f, 5.0f, cam_color1, &point_shader);
             model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
             draw_arrow(model, 0.5f, 0.2f, 5.0f, cam_color1, &point_shader);
 
