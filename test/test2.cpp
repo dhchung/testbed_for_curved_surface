@@ -34,6 +34,8 @@ int main(){
 
     params.camParam.PrintStuff();
     params.SLAMParam.PrintStuff();
+    std::cout<<"------------------------------"<<std::endl;
+
 
     //Testing for two surfels
     //yaw change with same plane measures
@@ -114,7 +116,11 @@ int main(){
     // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess(prior_state, measurement));
 
 
-    results = LevenbergMarquardtOptimizer(graph, initials).optimize();
+    LevenbergMarquardtParams parameters;
+    parameters.setVerbosity("Error");
+    LevenbergMarquardtOptimizer optimizer(graph, initials, parameters);
+    results = optimizer.optimize();
+    // results = LevenbergMarquardtOptimizer(graph, initials).optimize();
     // results = GaussNewtonOptimizer(graph, initials).optimize();
 
 
@@ -141,10 +147,10 @@ int main(){
                                                 (float)optimized_surfel.z};
         surfel_optimized.push_back(surfel_optimized_now);
 
-        std::cout<<"Initial Surfel at "<<i<<std::endl;
-        initial_surfel.print_surfel();
-        std::cout<<"Optimized Surfel at "<<i<<std::endl;
-        optimized_surfel.print_surfel();
+        // std::cout<<"Initial Surfel at "<<i<<std::endl;
+        // initial_surfel.print_surfel();
+        // std::cout<<"Optimized Surfel at "<<i<<std::endl;
+        // optimized_surfel.print_surfel();
 
     }
 
@@ -162,16 +168,14 @@ int main(){
         Pose3 optimized_state = results.at<Pose3>(X[j]);
         Pose3 initial_state2 = initials.at<Pose3>(X[j]);
 
-        std::cout<<"Yaw"<<std::endl;
-        std::cout<<optimized_state.rotation().yaw()*180.0/M_PI<<std::endl;
 
         state_optimized[j].block(0,0,4,4) = c_trans.Pose32Matrix4(optimized_state);
         state_initial[j].block(0,0,4,4) = c_trans.Pose32Matrix4(initial_state2);
 
-        std::cout<<"Initials at state "<<j<<std::endl;
-        std::cout<<state_initial[j]<<std::endl;
-        std::cout<<"Finals at state "<<j<<std::endl;
-        std::cout<<state_optimized[j]<<std::endl;
+        // std::cout<<"Initials at state "<<j<<std::endl;
+        // std::cout<<state_initial[j]<<std::endl;
+        // std::cout<<"Finals at state "<<j<<std::endl;
+        // std::cout<<state_optimized[j]<<std::endl;
 
     }
 

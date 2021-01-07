@@ -6,7 +6,7 @@ OpenglRendering::OpenglRendering(std::string window_name){
     screenWidth = 1600;
     screenHeight = 900;
 
-    camera = new Camera(glm::vec3(-2.0f, 0.0f, 1.0f), glm::vec3(0.0f,0.0f,-1.0f));
+    camera = new Camera(glm::vec3(-2.0f, 0.0f, -1.0f), glm::vec3(0.0f,0.0f,-1.0f));
 
     lastX = (float)screenWidth/2.0f;
     lastY = (float)screenHeight/2.0f;

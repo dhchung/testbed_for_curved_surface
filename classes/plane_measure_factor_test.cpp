@@ -16,7 +16,6 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
     //With pose : R and t
     //With surfel : Snx, Sny, Snz, Sx, Sy, Sz
     Vector3 g_sn(surfel.nx, surfel.ny, surfel.nz);
-    // g_sn = g_sn/sqrt(g_sn.transpose()*g_sn);
     Vector3 g_st(surfel.x, surfel.y, surfel.z);
 
     Matrix3 pose_R = pose.rotation().matrix();
@@ -26,21 +25,8 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
     Vector3 cur_sn = pose_R.transpose()*g_sn;
     Matrix3 cur_sn_skew = skewsym_matrix(cur_sn);
 
-    Matrix Hn1;
-    Matrix Hn2;
-
-    Point3 input_n(g_sn(0), g_sn(1), g_sn(2));
-    Point3 output_n = pose.rotation().unrotate(input_n, Hn1, Hn2);
-
-
     Vector3 cur_st = pose_R.transpose()*(g_st - pose_t);
     Matrix3 cur_st_skew = skewsym_matrix(cur_st);
-
-    Matrix Ht1;
-    Matrix Ht2;
-
-    Point3 input_t(g_st(0) - pose_t(0), g_st(1) - pose_t(1), g_st(2) - pose_t(2));
-    Point3 output_t = pose.rotation().unrotate(input_t, Ht1, Ht2);
 
     Vector3 measure_n = measured_.segment(0,3);
     Vector3 measure_t = measured_.segment(3,3);
@@ -49,7 +35,6 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
     Vector6 expected;
     expected.segment(0,3) = cur_sn;
     expected.segment(3,3) = cur_st;
-
 
     if(H1){
         Matrix H1_ = Matrix::Zero(6,6);
@@ -66,6 +51,7 @@ Vector PlaneMeasureFactorTest::evaluateError(const Pose3& pose, const Surfel & s
 
         *H2 = H2_;
     }
+
 
     Vector6 result;
     result = expected - measured_;
