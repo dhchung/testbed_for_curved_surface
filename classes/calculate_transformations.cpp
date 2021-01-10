@@ -306,6 +306,13 @@ surfelnode::Surfel CalTransform::get_initial_guess(gtsam::Pose3 & pose_initial, 
     return surfelnode::Surfel(t_normal(0), t_normal(1), t_normal(2), t_point(0), t_point(1), t_point(2));
 }
 
+surfelnodenew::Surfel CalTransform::get_initial_guess_new(gtsam::Pose3 & pose_initial, gtsam::Vector6 & measurement){
+    gtsam::Matrix4 I = gtsam::Matrix4::Identity(4,4);
+    gtsam::Matrix4 T = pose_initial.matrix();
+    gtsam::Unit3 t_normal = gtsam::Unit3(pose_initial.rotation().matrix()*measurement.segment(0,3));
+    gtsam::Point3 t_point = pose_initial.transformFrom(gtsam::Point3(measurement.segment(3,3)));
+    return surfelnodenew::Surfel(t_normal, t_point);
+}
 
 
 gtsam::Pose3 CalTransform::dxyzrpy2Pose3(std::vector<float> &dstate){

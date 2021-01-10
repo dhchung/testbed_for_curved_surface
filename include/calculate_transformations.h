@@ -7,6 +7,7 @@
 #include <gtsam/base/Matrix.h>
 #include <gtsam/geometry/Pose3.h>
 #include <surfel_node.h>
+#include <surfel_node_new.h>
 
 class CalTransform{
 public:
@@ -50,6 +51,8 @@ public:
     
     surfelnode::Surfel get_initial_guess(gtsam::Pose3 & pose_initial, gtsam::Vector4 & measurement);
     surfelnode::Surfel get_initial_guess(gtsam::Pose3 & pose_initial, gtsam::Vector6 & measurement);
+    
+    surfelnodenew::Surfel get_initial_guess_new(gtsam::Pose3 & pose_initial, gtsam::Vector6 & measurement);
 
     gtsam::Pose3 dxyzrpy2Pose3(std::vector<float> &dstate);
 

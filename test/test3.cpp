@@ -2,10 +2,9 @@
 #include "calculate_transformations.h"
 #include "opengl_rendering.h"
 #include "data_load_module.h"
-#include "plane_measure_factor_new.h"
-#include "surfel_node.h"
+#include "surfel_measure_factor.h"
+#include "surfel_node_new.h"
 #include "parameters_json.h"
-#include "coplanar_factor.h"
 
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
@@ -48,7 +47,7 @@ int main(){
 
     std::vector<float> state_0{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     std::vector<float> d_state{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/6};
-    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/4};
+    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0*M_PI/4};
     // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
     
 
@@ -77,13 +76,22 @@ int main(){
                                                  params.SLAMParam.odom_noise_translation, 
                                                  params.SLAMParam.odom_noise_translation).finished());
 
+    // noiseModel::Diagonal::shared_ptr measNoise = 
+    //     noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.measure_noise_normal, 
+    //                                              params.SLAMParam.measure_noise_normal, 
+    //                                              params.SLAMParam.measure_noise_normal,
+    //                                              params.SLAMParam.measure_noise_distance,
+    //                                              params.SLAMParam.measure_noise_distance/2.0,
+    //                                              params.SLAMParam.measure_noise_distance/2.0).finished());
+
     noiseModel::Diagonal::shared_ptr measNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(6)<<params.SLAMParam.measure_noise_normal, 
-                                                 params.SLAMParam.measure_noise_normal, 
+        noiseModel::Diagonal::Sigmas((Vector(5)<<params.SLAMParam.measure_noise_normal, 
                                                  params.SLAMParam.measure_noise_normal,
                                                  params.SLAMParam.measure_noise_distance,
                                                  params.SLAMParam.measure_noise_distance/2.0,
                                                  params.SLAMParam.measure_noise_distance/2.0).finished());
+
+
 
 
     Vector6 measurement;
@@ -94,9 +102,9 @@ int main(){
     L.push_back(Symbol('l', gtsam_idx));
     Pose3 prior_state = c_trans.dxyzrpy2Pose3(state_0);
     graph.add(PriorFactor<Pose3>(X[gtsam_idx], prior_state, priorNoise));
-    graph.add(boost::make_shared<PlaneMeasureFactorNew>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
+    graph.add(boost::make_shared<SurfelMeasureFactor>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
     initials.insert(X[gtsam_idx], prior_state);
-    initials.insert(L[gtsam_idx], c_trans.get_initial_guess(prior_state, measurement));
+    initials.insert(L[gtsam_idx], c_trans.get_initial_guess_new(prior_state, measurement));
 
     X.push_back(Symbol('x', gtsam_idx+1));
     L.push_back(Symbol('l', gtsam_idx+1));    
@@ -104,16 +112,16 @@ int main(){
     Pose3 d_state_pose_true = c_trans.dxyzrpy2Pose3(d_state);
     Pose3 d_state_pose3 = c_trans.dxyzrpy2Pose3(d_state2);
     Pose3 e_state = d_state_pose3;
-    Surfel e_surfel = c_trans.get_initial_guess(e_state, measurement);
+    Surfel e_surfel = c_trans.get_initial_guess_new(e_state, measurement);
 
     
     graph.add(BetweenFactor<Pose3>(X[gtsam_idx], X[gtsam_idx+1], d_state_pose_true, odomNoise));
-    graph.add(boost::make_shared<PlaneMeasureFactorNew>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
+    graph.add(boost::make_shared<SurfelMeasureFactor>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
     initials.insert(X[gtsam_idx+1], e_state);
     initials.insert(L[gtsam_idx+1], e_surfel);
 
     // initials.insert(X[gtsam_idx+1], prior_state);
-    // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess(prior_state, measurement));
+    // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess_new(prior_state, measurement));
 
 
     LevenbergMarquardtParams parameters;
@@ -123,7 +131,7 @@ int main(){
     // results = LevenbergMarquardtOptimizer(graph, initials).optimize();
     // results = GaussNewtonOptimizer(graph, initials).optimize();
 
-    results.print("asdf");
+    // results.print("asdf");
 
 
     std::vector<std::vector<float>> surfel_optimized;
@@ -133,20 +141,20 @@ int main(){
         Surfel initial_surfel = initials.at<Surfel>(L[i]);
         Surfel optimized_surfel = results.at<Surfel>(L[i]);
 
-        std::vector<float> surfel_initials_now{(float)initial_surfel.nx,
-                                               (float)initial_surfel.ny,
-                                               (float)initial_surfel.nz,
-                                               (float)initial_surfel.x,
-                                               (float)initial_surfel.y,
-                                               (float)initial_surfel.z};
+        std::vector<float> surfel_initials_now{(float)initial_surfel.normal_dir.unitVector().x(),
+                                               (float)initial_surfel.normal_dir.unitVector().y(),
+                                               (float)initial_surfel.normal_dir.unitVector().z(),
+                                               (float)initial_surfel.position.x(),
+                                               (float)initial_surfel.position.y(),
+                                               (float)initial_surfel.position.z()};
         surfel_initial.push_back(surfel_initials_now);
 
-        std::vector<float> surfel_optimized_now{(float)optimized_surfel.nx,
-                                                (float)optimized_surfel.ny,
-                                                (float)optimized_surfel.nz,
-                                                (float)optimized_surfel.x,
-                                                (float)optimized_surfel.y,
-                                                (float)optimized_surfel.z};
+        std::vector<float> surfel_optimized_now{(float)optimized_surfel.normal_dir.unitVector().x(),
+                                                (float)optimized_surfel.normal_dir.unitVector().y(),
+                                                (float)optimized_surfel.normal_dir.unitVector().z(),
+                                                (float)optimized_surfel.position.x(),
+                                                (float)optimized_surfel.position.y(),
+                                                (float)optimized_surfel.position.z()};
         surfel_optimized.push_back(surfel_optimized_now);
 
         // std::cout<<"Initial Surfel at "<<i<<std::endl;

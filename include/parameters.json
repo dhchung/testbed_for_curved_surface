@@ -41,11 +41,11 @@
         },
         {
             "name" : "measure_noise_normal",
-            "value" : 0.1
+            "value" : 0.01
         },
         {
             "name" : "measure_noise_distance",
-            "value" : 0.1
+            "value" : 0.01
         },
         {
             "name" : "absolute_noise_translation",
