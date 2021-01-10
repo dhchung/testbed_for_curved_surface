@@ -5,6 +5,7 @@
 #include "surfel_measure_factor.h"
 #include "surfel_node_new.h"
 #include "parameters_json.h"
+#include "coplanar_factor_new.h"
 
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Values.h>
@@ -119,6 +120,15 @@ int main(){
     graph.add(boost::make_shared<SurfelMeasureFactor>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
     initials.insert(X[gtsam_idx+1], e_state);
     initials.insert(L[gtsam_idx+1], e_surfel);
+
+
+    noiseModel::Diagonal::shared_ptr coplanarNoise = 
+        noiseModel::Diagonal::Sigmas((Vector(3)<<params.SLAMParam.measure_noise_normal, 
+                                                 params.SLAMParam.measure_noise_normal,
+                                                 params.SLAMParam.measure_noise_distance).finished());
+
+
+    graph.add(boost::make_shared<CoplanarFactorNew>(L[gtsam_idx], L[gtsam_idx+1], coplanarNoise));
 
     // initials.insert(X[gtsam_idx+1], prior_state);
     // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess_new(prior_state, measurement));

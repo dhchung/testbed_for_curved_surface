@@ -25,18 +25,20 @@ Vector SurfelMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surf
 
     Matrix HR;  //2*3
     Matrix Hp;  //2*2
+    Unit3 cur_sn = pose.rotation().unrotate(g_sn, HR, Hp);
+
     Matrix Dpose; //3*6
     Matrix Dpoint; //3*3
-
-    Unit3 cur_sn = pose.rotation().unrotate(g_sn, HR, Hp);
     Point3 cur_st = pose.transformTo(g_st, Dpose, Dpoint);
 
     // std::cout<<"HR"<<std::endl;
     // std::cout<<HR<<std::endl;
 
 
-    Matrix Hep;
-    Matrix Heq;
+    Matrix Hep; // 2*2
+    Matrix Heq; // 2*2
+
+
 
     Vector2 error_normal = m_n.errorVector(cur_sn, Heq, Hep);
     Vector3 error_position = m_p.localCoordinates(cur_st);
@@ -61,50 +63,4 @@ Vector SurfelMeasureFactor::evaluateError(const Pose3& pose, const Surfel & surf
     result << error_normal, error_position;
     return result;
 
-
-    // Vector3 g_sn(surfel.nx, surfel.ny, surfel.nz);
-    // g_sn = g_sn/sqrt(g_sn.transpose()*g_sn);
-    // Vector3 g_st(surfel.x, surfel.y, surfel.z);
-
-    // Matrix3 pose_R = pose.rotation().matrix();
-    // Vector3 pose_t(pose.x(), pose.y(), pose.z());
-
-    // Vector3 cur_sn = pose_R.transpose()*g_sn;
-    // Matrix3 cur_sn_skew = skewsym_matrix(cur_sn);
-
-    // Vector3 measure_n = measured_.segment(0,3);
-    // double measure_d = measured_(3);
-
-
-
-    // Vector4 expected;
-    // expected.segment(0,3) = pose_R.transpose()* g_sn;
-    // expected(3) = g_sn.transpose()*(pose_t - g_st);
-
-
-    // gtsam::Matrix H1_test;
-    // gtsam::Matrix H2_test;
-
-    // gtsam::Point3 normal_in(surfel.nx, surfel.ny, surfel.nz);
-    // gtsam::Point3 normal_out = pose.rotation().unrotate(normal_in, H1_test, H2_test);
-
-
-    // if(H1){
-    //     Matrix H1_ = Matrix::Zero(4,6);
-    //     // H1_.block(0,0,3,3) = cur_sn_skew;
-    //     H1_.block(0,0,3,3) = H1_test;
-    //     H1_.block(3,3,1,3) = g_sn.transpose();
-    //     *H1 = H1_;
-    // }
-    // if(H2){
-    //     Matrix H2_ = Matrix::Zero(4,6);
-    //     H2_.block(0,0,3,3) = pose_R.transpose();
-    //     H2_.block(3,0,1,3) = pose_t.transpose() - g_st.transpose();
-    //     H2_.block(3,3,1,3) = -g_sn.transpose();
-    //     *H2 = H2_;
-    // }
-
-    // Vector4 result;
-    // result = expected - measured_;
-    // return result;
 }

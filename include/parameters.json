@@ -25,11 +25,11 @@
     "slam_params": [
         {
             "name" : "odom_noise_translation",
-            "value" : 0.05
+            "value" : 0.8
         },
         {
             "name" : "odom_noise_angle",
-            "value" : 0.1
+            "value" : 2
         },
         {
             "name" : "init_noise_translation",
