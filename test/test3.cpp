@@ -128,7 +128,7 @@ int main(){
                                                  params.SLAMParam.measure_noise_distance).finished());
 
 
-    graph.add(boost::make_shared<CoplanarFactorNew>(L[gtsam_idx], L[gtsam_idx+1], coplanarNoise));
+    // graph.add(boost::make_shared<CoplanarFactorNew>(L[gtsam_idx], L[gtsam_idx+1], coplanarNoise));
 
     // initials.insert(X[gtsam_idx+1], prior_state);
     // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess_new(prior_state, measurement));

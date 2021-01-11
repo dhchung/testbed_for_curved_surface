@@ -48,7 +48,7 @@ int main(){
 
     std::vector<float> state_0{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     std::vector<float> d_state{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/6};
-    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, M_PI/4};
+    std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0*M_PI/4};
     // std::vector<float> d_state2{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0};
     
 
