@@ -31,15 +31,15 @@ void OpenglRendering::init_opengl(){
 
     
     window = glfwCreateWindow(screenWidth,screenHeight, w_name.c_str(), NULL, NULL);
+    if(window == NULL) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+    }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetWindowUserPointer(window, this);
 
 
-    if(window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
     
 
     glfwMakeContextCurrent(window); //Tell GLFW to setup "window context" as primary context for current thread

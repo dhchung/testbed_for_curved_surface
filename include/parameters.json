@@ -29,7 +29,7 @@
         },
         {
             "name" : "odom_noise_angle",
-            "value" : 2
+            "value" : 0.2
         },
         {
             "name" : "init_noise_translation",
@@ -41,11 +41,11 @@
         },
         {
             "name" : "measure_noise_normal",
-            "value" : 0.01
+            "value" : 0.1
         },
         {
             "name" : "measure_noise_distance",
-            "value" : 0.01
+            "value" : 0.1
         },
         {
             "name" : "absolute_noise_translation",
