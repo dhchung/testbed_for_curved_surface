@@ -2,7 +2,7 @@
 #include "calculate_transformations.h"
 #include "opengl_rendering.h"
 #include "data_load_module.h"
-#include "surfel_measure_factor.h"
+#include "surfel_measure_factor_plane.h"
 #include "surfel_node_new.h"
 #include "parameters_json.h"
 #include "coplanar_factor_new.h"
@@ -86,26 +86,27 @@ int main(){
     //                                              params.SLAMParam.measure_noise_distance/2.0).finished());
 
     noiseModel::Diagonal::shared_ptr measNoise = 
-        noiseModel::Diagonal::Sigmas((Vector(5)<<params.SLAMParam.measure_noise_normal, 
+        noiseModel::Diagonal::Sigmas((Vector(3)<<params.SLAMParam.measure_noise_normal, 
                                                  params.SLAMParam.measure_noise_normal,
-                                                 params.SLAMParam.measure_noise_distance,
-                                                 params.SLAMParam.measure_noise_distance/2.0,
-                                                 params.SLAMParam.measure_noise_distance/2.0).finished());
+                                                 params.SLAMParam.measure_noise_distance).finished());
 
 
 
 
-    Vector6 measurement;
+    Vector4 measurement;
     measurement<<-1.0, 0.0, 0.0, 1.0;
+
+    Vector6 measurement_temp;
+    measurement_temp<<-1.0, 0.0, 0.0, 1.0, 0.0, 0.0;
 
 
     X.push_back(Symbol('x', gtsam_idx));
     L.push_back(Symbol('l', gtsam_idx));
     Pose3 prior_state = c_trans.dxyzrpy2Pose3(state_0);
     graph.add(PriorFactor<Pose3>(X[gtsam_idx], prior_state, priorNoise));
-    graph.add(boost::make_shared<SurfelMeasureFactor>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
+    graph.add(boost::make_shared<SurfelMeasureFactorPlane>(X[gtsam_idx], L[gtsam_idx], measurement, measNoise));
     initials.insert(X[gtsam_idx], prior_state);
-    initials.insert(L[gtsam_idx], c_trans.get_initial_guess_new(prior_state, measurement));
+    initials.insert(L[gtsam_idx], c_trans.get_initial_guess_new(prior_state, measurement_temp));
 
     X.push_back(Symbol('x', gtsam_idx+1));
     L.push_back(Symbol('l', gtsam_idx+1));    
@@ -113,11 +114,11 @@ int main(){
     Pose3 d_state_pose_true = c_trans.dxyzrpy2Pose3(d_state);
     Pose3 d_state_pose3 = c_trans.dxyzrpy2Pose3(d_state2);
     Pose3 e_state = d_state_pose3;
-    Surfel e_surfel = c_trans.get_initial_guess_new(e_state, measurement);
+    Surfel e_surfel = c_trans.get_initial_guess_new(e_state, measurement_temp);
 
     
     graph.add(BetweenFactor<Pose3>(X[gtsam_idx], X[gtsam_idx+1], d_state_pose_true, odomNoise));
-    graph.add(boost::make_shared<SurfelMeasureFactor>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
+    graph.add(boost::make_shared<SurfelMeasureFactorPlane>(X[gtsam_idx+1], L[gtsam_idx+1], measurement, measNoise));
     initials.insert(X[gtsam_idx+1], e_state);
     initials.insert(L[gtsam_idx+1], e_surfel);
 
@@ -131,7 +132,7 @@ int main(){
     // graph.add(boost::make_shared<CoplanarFactorNew>(L[gtsam_idx], L[gtsam_idx+1], coplanarNoise));
 
     // initials.insert(X[gtsam_idx+1], prior_state);
-    // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess_new(prior_state, measurement));
+    // initials.insert(L[gtsam_idx+1], c_trans.get_initial_guess_new(prior_state, measurement_temp));
 
 
     LevenbergMarquardtParams parameters;

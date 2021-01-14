@@ -60,7 +60,7 @@ Vector SurfelMeasureFactorPlane::evaluateError(const Pose3& pose, const Surfel &
 
 
 
-    Vector5 result;
+    Vector3 result;
 
     result << error_normal, error_d;
     return result;
