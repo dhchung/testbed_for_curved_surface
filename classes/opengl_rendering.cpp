@@ -531,12 +531,12 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
         normals1[i][2] = surfels1[i][2];
     }
 
-    int sides = 150;
+    int sides = 5;
     float vertices[3*(sides+2)];
     float r = 0.2f;
     float edge_width = 0.02;
 
-    float vertices_edge_strip[6*(sides+2)];
+    float vertices_edge_strip[3*2*(sides+1)];
 
     for(int i = 0; i <(sides+2); ++i) {
         if(i==0){
@@ -550,14 +550,13 @@ void OpenglRendering::draw_surfels_init_n_final(std::vector<Eigen::Matrix4f> &st
         vertices[i*3+2] = r*sin(2.0f/float(sides)*(i-1)*M_PI);
     }
 
-    for(int i = 0; i < sides+2; ++i) {
+    for(int i = 0; i < sides+1; ++i) {
         vertices_edge_strip[6*i+0] = 0.0f;
-        vertices_edge_strip[6*i+1] = r*cos(2.0f/float(sides)*i*M_PI);
-        vertices_edge_strip[6*i+2] = r*sin(2.0f/float(sides)*i*M_PI);
+        vertices_edge_strip[6*i+1] = r*cos(2.0f*M_PI/float(sides)*float(i));
+        vertices_edge_strip[6*i+2] = r*sin(2.0f*M_PI/float(sides)*float(i));
         vertices_edge_strip[6*i+3] = 0.0f;
-        vertices_edge_strip[6*i+4] = (r+edge_width)*cos(2.0f/float(sides)*i*M_PI);
-        vertices_edge_strip[6*i+5] = (r+edge_width)*sin(2.0f/float(sides)*i*M_PI);
-
+        vertices_edge_strip[6*i+4] = (r+edge_width)*cos(2.0f*M_PI/float(sides)*float(i));
+        vertices_edge_strip[6*i+5] = (r+edge_width)*sin(2.0f*M_PI/float(sides)*float(i));
     }
 
 
